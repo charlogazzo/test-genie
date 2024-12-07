@@ -5,25 +5,28 @@ client = OpenAI()
 
 # ask it to do it without the extra response text at the beginning and the end of the file
 # only the csv data is required
-def generate_data(columns, number_of_records):
+def generate_data(headers, number_of_records):
+    # separate the header attributes here into different variables
+    # so they can be used in text
+    header_description = '\n'.join([(header['name'] + ': ' + header['description']) for header in headers])
+    header_examples = ', '.join([(header['name'] + ': ' + str(header['sample_data'])) for header in headers])
+
     messages = [{
         'role': 'user',
         'content': f'''
 I wish to generate test data in csv format.
 This test data describes the pulses taken for a number of patients.
-The data is to be generated with the following columns:
-{columns}
+The data is to be generated with the following headers:
+{[header['name'] for header in headers]}
 
+--- add description and sample data ---
+These are further details that describe the headers:
+{header_description}
 
-Generate {number_of_records} rows of data using these guidelines:
-Duration: describes how long the pulse was measured for. It should be specified in seconds.
-Possible values are 45 seconds, 60 seconds and 120 seconds
-Date: indicates the date the measurement was taken. This shoud be in dd.mm.yyyy format
-Pulse: indicate the average pulse recored for the duration of the measuremnt
-Max_Pulse: indicates the maximum pulse recored during the measurement
-Age: indicates the patients age
+These are some examples to generate the headers according to:
+{header_examples}
 
-I would like some omitted values in the age column
+Generate {number_of_records} rows of data
 
 The csv file should be comma-separated
 
