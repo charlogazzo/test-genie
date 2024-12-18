@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { generateCSV } from '../services/api';
+import './HeaderForm.css'
 
 const HeaderForm = ({ setDownloadUrl }) => {
   const [headers, setHeaders] = useState([{ name: '', description: '', sample_data: [''] }]);
