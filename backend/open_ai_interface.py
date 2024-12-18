@@ -45,16 +45,17 @@ Exclude any text in the response that is not the CSV data.
     generated_data = []
     generated_data.extend(data.strip().split('\n'))
 
+    with open('./pulseRate.csv', 'a+', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        for row in generated_data:
+            csvwriter.writerow(row.split(','))
+
     return generated_data
 
 # generated_data = []
 # data = generate_data()
 # generated_data.extend(data.strip().split('\n'))
 
-# with open('./medicalData.csv', 'a+', newline='') as csvfile:
-#     csvwriter = csv.writer(csvfile)
-#     for row in generated_data:
-#         csvwriter.writerow(row.split(','))
 
 # print("Synthetic data generation and appending completed.")
 
