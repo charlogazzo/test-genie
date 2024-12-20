@@ -3,11 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 from typing import List, Optional
-import open_ai_interface
+import handler.csv_handler
 import os
-import csv
-from datetime import datetime
-from io import StringIO
+import uuid
+
 
 app = FastAPI()
 
@@ -39,26 +38,11 @@ def get_csv(data: DataRequest):
         raise HTTPException(status_code=400, detail="Headers cannot be empty")
     if data.number_of_records <= 0:
         raise HTTPException(status_code=400, detail="Number of requested records must be more than 0")
-
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    file_name = f"data_{timestamp}.csv"
-    file_path = os.path.join(STORAGE_DIR, file_name)
-
-    headers = [
-        {"name": header.name, "description": header.description, "sample_data": header.sample_data}
-        for header in data.headers
-    ]
-    response = open_ai_interface.generate_data(headers, data.number_of_records)
-
-    output = StringIO()
-    csvwriter = csv.writer(output, quoting=csv.QUOTE_MINIMAL)
-    # csvwriter.writerow([header['name'] for header in headers])
-    for row in response:
-        csvwriter.writerow(row.split(','))
-
-    # find a way to store this output locally and also send it as a Streaming response
-    output.seek(0)
-    return StreamingResponse(output, media_type="text/csv", headers={"Content-Disposition": f"attachment; filename={file_name}"})
+    
+    csv_output = handler.csv_handler.get_csv_data(data)
+    
+    csv_output.seek(0)
+    return StreamingResponse(csv_output, media_type="text/csv", headers={"Content-Disposition": f"attachment; filename='csv_data.csv'"})
 
 @app.get('/download-csv/{file_name}')
 def download_csv(file_name: str):
