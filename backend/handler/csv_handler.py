@@ -22,6 +22,9 @@ def get_json_data(data):
     # output = StringIO(newline=None)
     json_response = json.loads(response)
 
+    # store the json file
+    json_file_storage(json_response)
+
     return json_response
 
 
@@ -39,6 +42,14 @@ def get_csv_data(data):
     csv_file_storage(csv_data)
 
     return csv_data
+
+def json_file_storage(json_data): 
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    file_name = f"data_{timestamp}.json"
+    file_path = os.path.join(STORAGE_DIR, file_name)
+
+    with open(file_path, 'w') as f:
+        json.dump(json_data, f, indent=4)
 
 
 def csv_file_storage(csv_data):

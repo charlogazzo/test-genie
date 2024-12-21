@@ -9,8 +9,20 @@ export const generateCSV = async (data) => {
   });
 };
 
+export const generateJSON = async (data) => { 
+  return axios.post(`${API_URL}/json-data`, data, { 
+    responseType: 'json' 
+  }); 
+};
+
 export const downloadCSV = async (fileName) => {
   return axios.get(`${API_URL}/download-csv/${fileName}`, {
     responseType: 'blob'
   });
 };
+
+export const downloadJSON = async (fileName) => {
+  return axios.get(`${API_URL}/download-json/${fileName}`, {
+    responseType: 'json'
+  });
+}
