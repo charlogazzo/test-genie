@@ -41,7 +41,7 @@ def get_csv(data: DataRequest):
     
     csv_output = handler.csv_handler.get_csv_data(data)
     
-    csv_output.seek(0)
+    # csv_output.seek(0)
     return StreamingResponse(csv_output, media_type="text/csv", headers={"Content-Disposition": f"attachment; filename='csv_data.csv'"})
 
 @app.get('/download-csv/{file_name}')
