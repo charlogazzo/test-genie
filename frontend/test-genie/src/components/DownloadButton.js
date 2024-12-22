@@ -9,7 +9,10 @@ const DownloadButton = ({ downloadUrl, jsonData }) => {
         </a>
       )}
       {jsonData && (
-        <a href={`data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(jsonData))}`} download="data.json">
+        <a 
+          href={`data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(jsonData, null, 4))}`} 
+          download="data.json"
+        >
           <button>Download JSON</button>
         </a>
       )}
