@@ -1,15 +1,22 @@
-// src/components/DownloadButton.js
 import React from 'react';
 
-const DownloadButton = ({ downloadUrl }) => {
+const DownloadButton = ({ downloadUrl, jsonData }) => {
   return (
-    downloadUrl && (
-      // find a way to get the csv file to be named
-      // the name should be the same as what is stored in the server
-      <a href={downloadUrl} download="data.csv">
-        <button>Download CSV</button>
-      </a>
-    )
+    <div>
+      {downloadUrl && (
+        <a href={downloadUrl} download="data.csv">
+          <button>Download CSV</button>
+        </a>
+      )}
+      {jsonData && (
+        <a 
+          href={`data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(jsonData, null, 4))}`} 
+          download="data.json"
+        >
+          <button>Download JSON</button>
+        </a>
+      )}
+    </div>
   );
 };
 

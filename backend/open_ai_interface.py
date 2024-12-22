@@ -14,8 +14,7 @@ def generate_data(headers, number_of_records):
     messages = [{
         'role': 'user',
         'content': f'''
-I wish to generate test data in csv format.
-This test data describes the pulses taken for a number of patients.
+I wish to generate test data in json format.
 The data is to be generated with the following headers:
 {[header['name'] for header in headers]}
 
@@ -28,8 +27,6 @@ These are some examples to generate the headers according to:
 
 Generate {number_of_records} rows of data
 
-The csv file should be comma-separated
-
 Exclude any text in the response that is not the CSV data.
 
 '''
@@ -40,13 +37,13 @@ Exclude any text in the response that is not the CSV data.
         messages=messages
     )
 
-    data = response.choices[0].message.content.replace('```csv', '').replace('```', '')
+    data = response.choices[0].message.content.replace('```json', '').replace('```', '')
 
     generated_data = []
     generated_data.extend(data.strip().split('\n'))
 
 
-    return generated_data
+    return data
 
 # generated_data = []
 # data = generate_data()

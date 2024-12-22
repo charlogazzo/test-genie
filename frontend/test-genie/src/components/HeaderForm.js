@@ -1,15 +1,11 @@
-// src/components/HeaderForm.js
 import React, { useState } from 'react';
-import axios from 'axios';
-import { generateCSV } from '../services/api';
-import './HeaderForm.css'
+import { generateCSV, generateJSON } from '../services/api';
+import './HeaderForm.css';
 
-const HeaderForm = ({ setDownloadUrl }) => {
+const HeaderForm = ({ setDownloadUrl, setJsonData }) => {
   const [headers, setHeaders] = useState([{ name: '', description: '', sample_data: [''] }]);
 
-  const handleAddHeader = () => {
-    setHeaders([...headers, { name: '', description: '', sample_data: [''] }]);
-  };
+  const handleAddHeader = () => setHeaders([...headers, { name: '', description: '', sample_data: [''] }]);
 
   const handleInputChange = (index, event) => {
     const { name, value } = event.target;
@@ -22,12 +18,10 @@ const HeaderForm = ({ setDownloadUrl }) => {
     setHeaders(newHeaders);
   };
 
-  const handleSubmit = async (event) => {
+  const handleCSVSubmit = async (event) => {
     event.preventDefault();
-    const requestData = { headers, number_of_records: 10 }; // Adjust number of records as needed
-
     try {
-      const response = await generateCSV(requestData);
+      const response = await generateCSV({ headers, number_of_records: 10 });
       const url = window.URL.createObjectURL(new Blob([response.data]));
       setDownloadUrl(url);
     } catch (error) {
@@ -35,8 +29,18 @@ const HeaderForm = ({ setDownloadUrl }) => {
     }
   };
 
+  const handleJSONSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await generateJSON({ headers, number_of_records: 10 });
+      setJsonData(response.data);
+    } catch (error) {
+      console.error('Error generating JSON:', error);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="header-form">
       {headers.map((header, index) => (
         <div key={index} className="header-row">
           <input
@@ -63,8 +67,11 @@ const HeaderForm = ({ setDownloadUrl }) => {
           />
         </div>
       ))}
-      <button type="button" onClick={handleAddHeader}>Add Header</button>
-      <button type="submit">Generate CSV</button>
+      <div className="buttons">
+        <button type="button" onClick={handleAddHeader}>Add Header</button>
+        <button type="submit" onClick={handleCSVSubmit}>Generate CSV</button>
+        <button type="submit" onClick={handleJSONSubmit}>Generate JSON</button>
+      </div>
     </form>
   );
 };
