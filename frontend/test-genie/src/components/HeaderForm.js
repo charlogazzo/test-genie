@@ -4,6 +4,7 @@ import './HeaderForm.css';
 
 const HeaderForm = ({ setDownloadUrl, setJsonData }) => {
   const [headers, setHeaders] = useState([{ name: '', description: '', sample_data: [''] }]);
+  const [fileType, setFileType] = useState('csv'); // State to handle file type selection
 
   const handleAddHeader = () => setHeaders([...headers, { name: '', description: '', sample_data: [''] }]);
 
@@ -18,29 +19,32 @@ const HeaderForm = ({ setDownloadUrl, setJsonData }) => {
     setHeaders(newHeaders);
   };
 
-  const handleCSVSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      const response = await generateCSV({ headers, number_of_records: 10 });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      setDownloadUrl(url);
-    } catch (error) {
-      console.error('Error generating CSV:', error);
-    }
+  const handleFileTypeChange = (event) => {
+    setFileType(event.target.value);
   };
 
-  const handleJSONSubmit = async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    const requestData = { headers, number_of_records: 10 }; // Adjust number of records as needed
+
     try {
-      const response = await generateJSON({ headers, number_of_records: 10 });
-      setJsonData(response.data);
+      if (fileType === 'csv') {
+        const response = await generateCSV(requestData);
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        setDownloadUrl(url);
+        setJsonData(null);
+      } else if (fileType === 'json') {
+        const response = await generateJSON(requestData);
+        setJsonData(response.data);
+        setDownloadUrl(null);
+      }
     } catch (error) {
-      console.error('Error generating JSON:', error);
+      console.error(`Error generating ${fileType.toUpperCase()}:`, error);
     }
   };
 
   return (
-    <form className="header-form">
+    <form className="header-form" onSubmit={handleSubmit}>
       {headers.map((header, index) => (
         <div key={index} className="header-row">
           <input
@@ -67,10 +71,16 @@ const HeaderForm = ({ setDownloadUrl, setJsonData }) => {
           />
         </div>
       ))}
+      <div className="dropdown">
+        <label htmlFor="fileType">Select File Type:</label>
+        <select id="fileType" value={fileType} onChange={handleFileTypeChange}>
+          <option value="csv">CSV</option>
+          <option value="json">JSON</option>
+        </select>
+      </div>
       <div className="buttons">
         <button type="button" onClick={handleAddHeader}>Add Header</button>
-        <button type="submit" onClick={handleCSVSubmit}>Generate CSV</button>
-        <button type="submit" onClick={handleJSONSubmit}>Generate JSON</button>
+        <button type="submit">Generate File</button>
       </div>
     </form>
   );
