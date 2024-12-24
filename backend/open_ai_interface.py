@@ -27,7 +27,7 @@ These are some examples to generate the headers according to:
 
 Generate {number_of_records} rows of data
 
-Exclude any text in the response that is not the CSV data.
+Exclude any text in the response that is not the JSON data.
 
 '''
     }]
@@ -45,13 +45,43 @@ Exclude any text in the response that is not the CSV data.
 
     return data
 
-# generated_data = []
-# data = generate_data()
-# generated_data.extend(data.strip().split('\n'))
 
+def generate_sql(headers, number_of_records, table_name, create_table):
+    header_description = '\n'.join([(header['name'] + ': ' + header['description']) for header in headers])
+    header_examples = ', '.join([(header['name'] + ': ' + str(header['sample_data'])) for header in headers])
+    print('create table:', create_table)
 
-# print("Synthetic data generation and appending completed.")
+    create_table = 'a' if create_table == 'CREATE TABLE' else 'no'
 
-# generate 100 rows of test data using first name, last name, age, project_number
-# generate 5 rows first and use those 5 rows to generate 100 more rows
-# by asking the model to output similar data types
+    messages = [{
+        'role': 'user',
+        'content': f'''
+I wish to generate test data that will be inserted in an sql database
+The data is to be generated with the following column names:
+{[header['name'] for header in headers]}
+
+--- add description and sample data ---
+These are further details that describe the headers:
+{header_description}
+
+These are some examples to generate the headers according to:
+{header_examples}
+
+Generate {number_of_records} rows of data
+
+Exclude any text in the response that is not the SQL data.
+
+The name of the table is {table_name} and generate {create_table} create table statement.
+If a create table statement is added, drop the table with the same table name first
+'''
+    }]
+
+    response = client.chat.completions.create(
+        model='chatgpt-4o-latest',
+        messages=messages
+    )
+
+    return response.choices[0].message.content.replace('```sql', '').replace('```', '')
+
+    
+
